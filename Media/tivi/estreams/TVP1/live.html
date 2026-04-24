@@ -1,1 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.4.2/shaka-player.ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mux.js@5.5.3/dist/mux.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.4.2/controls.min.css"/>
+<script defer src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+<script disable-devtool-auto="" src='./js/console.js'></script>
+<style>
+ body {
+     overflow: hidden;
+     background: #000;
+}
+ .youtube-theme {
+     font-family: 'Roboto', sans-serif;
+}
+ .youtube-theme .shaka-bottom-controls {
+     width: 100%;
+     padding: 0;
+     padding-bottom: 0;
+     z-index: 1;
+}
+ .youtube-theme .shaka-bottom-controls {
+     display: -webkit-box;
+     display: -ms-flexbox;
+     display: flex;
+     -webkit-box-orient: vertical;
+     -webkit-box-direction: normal;
+     -ms-flex-direction: column;
+     flex-direction: column;
+}
+.logo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+    width: 90px;
+    height: 90px;
+    border-radius: 15px;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+.logo.hidden {
+    opacity: 0;
+}
+.site-title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+.site-title.hidden {
+    opacity: 0;
+}
+</style>
+</head>
+<body>
+<div class="youtube-theme" data-shaka-player-container id='player' style='position:absolute;z-index: -1;top: 0;left: 0;width: 100%; height: 100%;object-fit: cover;'>
+<video autoplay data-shaka-player poster="" id='video' style='width:100%;height:100%;'></video>
+</div>
 
+<script>
+    const manifestUri =
+    'https://estreams.tv.nej.cz/dash/CH_TVP1_Portable.ism/playlist.mpd';
+    async function init() {
+    const video = document.getElementById('video');
+    const ui = video['ui'];
+    const config = {
+    seekBarColors: {
+    base: '#4d4d4d',
+    played: '#0d6efd',
+    buffered: '#8a8a8a',
+    },
+    volumeBarColors: {
+    base: 'rgb(77, 77, 77)',
+    level: 'rgb(255, 255, 255)',
+    },
+    customContextMenu: true,
+    addBigPlayButton: false,
+    contextMenuElements: ['statistics', 'loop'],
+    overflowMenuButtons: ['captions', 'cast', 'quality', 'language', 'loop', 'playback_rate', 'airplay'],
+    enableTooltips: true,
+    };
+    ui.configure(config);
+    const controls = ui.getControls();
+    const player = controls.getPlayer();
+
+    window.player = player;
+    window.ui = ui;
+
+    player.addEventListener('error', onPlayerErrorEvent);
+    player.configure({
+      drm: {
+        clearKeys: {
+          "":"",
+        }
+      }
+    });
+    controls.addEventListener('error', onUIErrorEvent);
+
+    try {
+        await player.load(manifestUri);
+    } catch (error) {
+        onPlayerError(error);
+    }
+    }
+
+    function onPlayerErrorEvent(errorEvent) {
+        onPlayerError(event.detail);
+    }
+
+    function onPlayerError(error) {
+        console.error('Error code', error.code, 'object', error);
+    }
+
+    function onUIErrorEvent(errorEvent) {
+        onPlayerError(event.detail);
+    }
+
+    function initFailed(errorEvent) {
+        console.error('Unable to load the UI library!');
+    }
+
+    document.addEventListener('shaka-ui-loaded', init);
+    document.addEventListener('shaka-ui-load-failed', initFailed);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const videoElement = document.getElementById('video');
+        const logoElement = document.getElementById('logo');
+        const siteTitleElement = document.getElementById('site-title');
+
+        if ('pictureInPictureEnabled' in document) {
+            videoElement.disablePictureInPicture = true;
+        }
+
+        let hideTimeout;
+
+        const showElements = () => {
+            logoElement.classList.remove('hidden');
+            siteTitleElement.classList.remove('hidden');
+            clearTimeout(hideTimeout);
+
+            hideTimeout = setTimeout(() => {
+                if (document.fullscreenElement) {
+                    logoElement.classList.add('hidden');
+                    siteTitleElement.classList.add('hidden');
+                }
+            }, 3000);
+        };
+
+        document.addEventListener('mousemove', showElements);
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                logoElement.classList.remove('hidden');
+                siteTitleElement.classList.remove('hidden');
+            }
+        });
+
+        showElements();
+    });
+</script>
+</body>
+  </html>
