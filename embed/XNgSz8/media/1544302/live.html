@@ -1,0 +1,224 @@
+<html>
+  <head>
+    <title>TVP 2</title>
+    <script>
+      
+    </script>
+  </head>
+  <body style="margin: 0">
+  <div style="background-color: #000;" class="aspect-ratio-box">
+  <div class="aspect-ratio-box-inside" id="playerContainer" style="background: url('https://redirector.redefine.pl/versions/cp-player-loader.gif') 50% 50% no-repeat; background-size: 5%;">
+</div>
+</div>
+
+  <script src="//redirector.redefine.pl/versions/cp-player-2.js"></script>
+
+<script>
+  function getParameterByName(e) {
+  var n = window.location.search,
+    r = new RegExp("[?&]" + e + "=([^&]*)").exec(n);
+  return r && decodeURIComponent(r[1].replace(/\+/g, " "));
+}
+function getProfilingConsentFromHref() {
+  return new Promise(function (e) {
+    switch (getParameterByName(PROFILING_CONSENT_HREF_PARAM_NAME)) {
+      case "1":
+        e(!0);
+        break;
+      case "0":
+        e(!1);
+        break;
+      default:
+        e(null);
+    }
+  });
+}
+var PROFILING_CONSENT_HREF_PARAM_NAME = "profilingConsent",
+  getProfilingConsent = getProfilingConsentFromHref;
+
+</script>
+<script>
+  function loadParams() {
+    var params = {
+          mediaId: "1544302",
+          playerDataUrl: "https://miro1642.github.io/partner_api/v1/XNgSz8/media/MEDIA_ID/live/player_data.json",
+          playbackQueueUrl: "https://miro1642.github.io/partner_api/v1/XNgSz8/media/MEDIA_ID/live/next_media.json",
+          portalCode: "fakty_interia",
+    };
+  
+    return params
+  }
+</script>
+<script>
+  function getParentDomainName() {
+  if ("undefined" != typeof document.referrer) return document.referrer.match(/:\/\/(.[^/]+)/)[1];
+}
+function getQueryParams() {
+  var r = window.location.search.slice(1).split("&"),
+    t = {};
+  return (
+    r.forEach(function (r) {
+      var a = r.split("="),
+        e = a[0],
+        n = a[1];
+      n && (t[e] = decodeURIComponent(n));
+    }),
+    t
+  );
+}
+function getExtraParams() {
+  var r = queryParams.extraParams;
+  return r || (r = ""), r;
+}
+function booleanFromQueryParam(r) {
+  return "1" === r;
+}
+function prepareLoadParams() {
+  var r = {};
+  return (
+    queryParams.start_position && (r.startPosition = Number.parseInt(queryParams.start_position)),
+    queryParams.stop_position && (r.stopPosition = Number.parseInt(queryParams.stop_position)),
+    queryParams.autoplay && (r.autoplay = booleanFromQueryParam(queryParams.autoplay)),
+    r
+  );
+}
+var DESCRIPTION_URL_KEY_NAME = "description_url",
+  ERROR_CODES = {
+    MEDIA_NOT_FOUND: 1310,
+    MEDIA_NOT_IN_PORTAL: 1311,
+    DRM_LICENSE_EXPIRED: 1507,
+    LICENSE_LOCATION_ERROR: 13404,
+  };
+document.querySelector("#playerContainer");
+var queryParams = getQueryParams(),
+  extraParams = getExtraParams(),
+  embedParams = loadParams();
+getProfilingConsent().then(function (r) {
+  function a() {
+    var r = "";
+    if (-1 !== extraParams.indexOf(DESCRIPTION_URL_KEY_NAME))
+      try {
+        r = JSON.parse(extraParams).description_url;
+      } catch (a) {
+        (r = ""), console.error("Invalid JSON passed to extraParams\n", a);
+      }
+    return r;
+  }
+  function e() {
+    if (!extraParams) return {};
+    try {
+      return JSON.parse(extraParams);
+    } catch (r) {
+      return console.error("Invalid JSON passed to extraParams\n", r), {};
+    }
+  }
+  function n() {
+    var r = {},
+      a = queryParams.purchaseCode,
+      e = queryParams.externalUserId;
+    return void 0 !== a && (r.purchaseCode = a), void 0 !== e && (r.externalUserId = e), r;
+  }
+  function i(r, a, e, n, t) {
+    var o = [];
+    return (
+      o.push(u("dev", r)),
+      o.push(u("os", a)),
+      o.push(u("player", e)),
+      o.push(u("app", n)),
+      o.push(u("build", t)),
+      o.join("&")
+    );
+  }
+  function u(r, a) {
+    return r + "=" + encodeURIComponent(a);
+  }
+  function s(r, a) {
+    return /\?/.test(r) ? r + "&" + a : r + "?" + a;
+  }
+  function P(r, a) {
+    return a.replace("MEDIA_ID", r);
+  }
+  var t = {
+    container: document.getElementById("playerContainer"),
+    userAgentData: { portal: embedParams.portalCode },
+    ua: "/",
+    load: prepareLoadParams(),
+    playback: { mute: booleanFromQueryParam(queryParams.muted) },
+    ads: { descriptionUrl: a(), customParams: e(), profilingConsent: r },
+    externalData: n(),
+  };
+  window.location != window.parent.location && (t.originDomain = getParentDomainName());
+  var m = new window.CyfrowyPlayer.PolsatGoPlayer(t);
+  m.ready.then(function () {
+    m.registerPlugin({
+      canDo: function (r) {
+        return "getPlayData" === r.name;
+      },
+      run: function (r, e) {
+        var n,
+          t = embedParams.mediaId;
+        r && (t = r.params.gmID.id);
+        var a = function (r) {
+            if ((n = r.data).error) {
+              var a,
+                e = n.error.code;
+              throw (
+                (((a =
+                  e === ERROR_CODES.MEDIA_NOT_FOUND || e === ERROR_CODES.MEDIA_NOT_IN_PORTAL
+                    ? new CyfrowyPlayer.CPError(CyfrowyPlayer.CPError.TYPE.MEDIA_NOT_FOUND, n.error)
+                    : e === ERROR_CODES.LICENSE_LOCATION_ERROR
+                    ? new CyfrowyPlayer.CPError(
+                        CyfrowyPlayer.CPError.TYPE.MEDIA_INACCESSIBLE,
+                        n.error
+                      )
+                    : e === ERROR_CODES.DRM_LICENSE_EXPIRED
+                    ? new CyfrowyPlayer.CPError(
+                        CyfrowyPlayer.CPError.TYPE.DRM_LICENSE_EXPIRED,
+                        n.error
+                      )
+                    : new CyfrowyPlayer.CPError(
+                        CyfrowyPlayer.CPError.TYPE.REQUEST_ERROR,
+                        n.error
+                      )).message = "".concat(n.error.message, " (").concat(n.error.code, ")")),
+                a)
+              );
+            }
+            return r;
+          },
+          o = function (r) {
+            return (
+              (n = r.data),
+              e.plugins.run({
+                name: "makeRequest",
+                params: { url: P(t, embedParams.playbackQueueUrl) },
+              })
+            );
+          },
+          u = function (r) {
+            return o(r)["catch"](function () {});
+          };
+        return (function () {
+          var r = e.config.userAgentDataWithFeatures,
+            a = s(
+              embedParams.playerDataUrl,
+              i(r.deviceType, r.os, r.player, r.application, r.build)
+            );
+          return e.plugins.run({ name: "makeRequest", params: { url: P(t, a) } });
+        })()
+          ["catch"](function (r) {
+            throw new CyfrowyPlayer.CPError(CyfrowyPlayer.CPError.TYPE.REQUEST_ERROR, r);
+          })
+          .then(a)
+          .then(u)
+          .then(function (r) {
+            return r && (n.playbackQueue = r.data), m.parseToMediaDefinition(n);
+          });
+      },
+    }),
+      m.load({ gmID: { cpid: 1, id: embedParams.mediaId } });
+  });
+});
+
+</script>
+  </body>
+</html>
