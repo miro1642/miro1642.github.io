@@ -231,7 +231,7 @@
 
     <div id="header">
         <h1>SPORT🔥📺</h1>
-        <div id="chan-count">0 CANALI</div>
+        <div id="chan-count">0 Kanałów Sportowych</div>
     </div>
 
     <div class="player-container" data-shaka-player-container>
@@ -376,7 +376,7 @@ async function init() {
                 ch = { drm: {} };
             }
         }
-        chanCount.innerText = count + " CANALI";
+        chanCount.innerText = count + " Kanałów Sportowych";
     } catch(e) { console.error("Errore API:", e); }
 }
 document.addEventListener('shaka-ui-loaded', init);
