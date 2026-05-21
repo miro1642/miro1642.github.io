@@ -274,18 +274,6 @@ https://bks400-tol-110.quieroxview.com.mx/bpk-tv/espn_3_hd/default/index.mpd
 #KODIPROP:inputstream.adaptive.license_key={"0c39778fe8fb4f9f8574016b3d4ae2ed":"232b1f450f2e37f47fdd5b678a8a546d"}
 https://bks400-tol-110.quieroxview.com.mx/bpk-tv/espn_plus_hd/default/index.mpd
 
-#EXTINF:-1 group-title="DAZN LINEARI" tvg-logo="https://github.com/skydrome/tvg-logos/blob/master/dazn.sport1.png?raw=true" tvg-id="DAZN.1.it.it",DAZN 1
-#KODIPROP:inputstream.adaptive.stream_headers=user-agent=Mozilla/5.0 (Web0S; Linux/SmartTV) AppleWebKit/537.41 (KHTML, like Gecko) Large Screen Safari/537.41 LG Browser/7.00.00(LGE; WEBOS1; 05.06.10; 1); webOS.TV-2014; LG NetCast.TV-2013 Compatible (LGE, WEBOS1, wireless)
-#KODIPROP:inputstream.adaptive.license_type=clearkey
-#KODIPROP:inputstream.adaptive.license_key=6164a0abaa7c53c6875fa1e7fe0bb463:271510d3e1259571dcc568a232e397eb
-https://dcs-ak-livedazn.akamaized.net/@st%3D1779357608~exp%3D1779444008~acl%3D%2F*~id%3D9827c3cf91d3~data%3Dproto%3Ddash%23country%3Dit%23asn%3D3269%23path%3D1s%2C2d%23hashp%3D7146d3dea70044f8d191494cbaf9b170539059551a801458f7e9193ddef7835d~hmac%3D1db5c8e0b40215de15a16d2ff2f07fd0815bfa5de7e8bb2027a85851db73e809/dash/dazn-linear-206/stream.mpd?p=web
-
-#EXTINF:-1 group-title="Włochy" tvg-logo="https://static.wikia.nocookie.net/logopedia/images/1/18/DAZN_1_2024.svg","DAZN 1 WIFI
-#KODIPROP:inputstream.adaptive.manifest_type=mpd
-#KODIPROP:inputstream.adaptive.license_type=clearkey
-#KODIPROP:inputstream.adaptive.license_key={"6164a0abaa7c53c6875fa1e7fe0bb463":"271510d3e1259571dcc568a232e397eb"}
-https://dct-fs-live-dazn-cdn.dazn.com/@eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzkwMjg3MDMsImtpZCI6IjIwMjIxMTIzIiwicGF0aF9kIjoyLCJwYXRoIjoiOGViOTUwYjA5YmIxZjMzOTBlZDQ4ODgzN2VhZjk5ODY3MDc2OTRkMSIsInNzaWQiOiI2MjFkY2E0ZTE0M2UiLCJwcm90byI6ImRhc2giLCJnZW8iOiJpdCIsImFzbiI6WyIyMTAyNzgiXSwidWEiOiIxNGNkZmY1NTE5YjZjOTQwODUwMmE0ZDI2MmNkNzQ1NjUzODYyMzM4IiwiaWF0IjoxNzc4OTQyMzAzfQ.NjdSMX6Kv5XV2dik4qvJqYNZyjwxFS2AXyRU5_JkMlI/dash/dazn-linear-206/stream.mpd?p=web
-
 #EXTINF:-1 group-title="Włochy" tvg-logo="https://thumb.prod.front.tim.cptech.pro/http/unsafe/120x90/img-cdn.prod.catalog.tim.cptech.pro/p1/channel/90020019/tim-ouah/CHN43FN/MONOGRAM_ESP4K_WHITE_V2-BjK0","EUROSPORT 4K
 #KODIPROP:inputstream.adaptive.manifest_type=mpd
 #KODIPROP:inputstream.adaptive.license_type=clearkey
