@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
     // Weryfikacja hasła
     if (!psw || !authorizedPasswords.includes(psw)) {
-        return res.status(401).json({ error: 'Password errata' });
+        return res.status(401).json({ error: 'Password errata 1' });
     }
 
     // Obsługa zapytania Heartbeat (jeśli frontend wciąż je wysyła)
