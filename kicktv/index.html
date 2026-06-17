@@ -148,22 +148,8 @@ function setupSplash() {
     setTimeout(hideSplashAndAskPassword, 3000);
 }
 
-// === GESTIONE PASSWORD ===
+// === GESTIONE PASSWORD (UPROSZCZONA) ===
 let passwordGlobale = "";
-let heartbeatInterval;
-
-function startHeartbeat(password) {
-    if (heartbeatInterval) clearInterval(heartbeatInterval);
-    heartbeatInterval = setInterval(async () => {
-        try {
-            await fetch("/api/get-list", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-heartbeat': 'true' },
-                body: JSON.stringify({ password: password })
-            });
-        } catch (e) { console.warn("Sessione persa"); }
-    }, 15000);
-}
 
 async function checkAccess() {
     const psw = prompt("Password:");
@@ -178,22 +164,30 @@ async function checkAccess() {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            alert(errorData.error || "Sessione già attiva o password errata!");
+            alert(errorData.error || "Password errata!");
             window.location.reload();
             return;
         }
 
         const m3uData = await response.text();
         passwordGlobale = psw;
+        
+        // Pokazuje główną zawartość aplikacji
         document.getElementById('main-content').style.display = "flex";
         
-        startHeartbeat(psw);
-        init(m3uData);
+        // Wywołanie Twojej oryginalnej funkcji parsującej listę kanałów
+        if (typeof init === "function") {
+            init(m3uData);
+        }
 
     } catch (error) {
         alert("Errore server.");
     }
 }
+
+// Uruchomienie ekranu startowego
+setupSplash();
+
 
 // === INIZIALIZZAZIONE PLAYER E CANALI ===
 const FALLBACK_ICON = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 80" fill="none"><rect width="150" height="80" fill="#161b22"/><text x="75" y="45" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="14" fill="#f0f6fc">TV</text></svg>`);
