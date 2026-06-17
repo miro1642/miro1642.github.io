@@ -1,3 +1,4 @@
+import { createClient } from '@vercel/kv';
 import fs from 'fs';
 import path from 'path';
 
@@ -8,6 +9,12 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-heartbeat');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
+
+    // Crea il client KV usando le variabili automatiche di Vercel
+    const kv = createClient({
+        url: process.env.KV_REST_API_URL,
+        token: process.env.KV_REST_API_TOKEN,
+    });
 
     // Legge il corpo della richiesta
     let body = {};
@@ -24,6 +31,7 @@ export default async function handler(req, res) {
 
     // ==========================================
     // TUTAJ WPISUJESZ HASŁO BEZPOŚREDNIO W KODZIE
+    // Możesz wpisać jedno lub kilka haseł po przecinku
     // ==========================================
     const authorizedPasswords = ['KICK2026', 'mojeDrugieHaslo'];
 
@@ -32,10 +40,22 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Password errata' });
     }
 
-    // Heartbeat: Odpowiedź sukcesu (bez zapisu w bazie danych)
+    const sessionKey = `session_${psw}`;
+
+    // Heartbeat: rinnova sessione (TTL 25 secondi)
     if (req.headers['x-heartbeat'] === 'true') {
+        await kv.set(sessionKey, 'active', { ex: 25 });
         return res.status(200).json({ status: 'ok' });
     }
+
+    // Controllo sessione già attiva (impedisce accessi simultanei)
+    const isOccupied = await kv.get(sessionKey);
+    if (isOccupied) {
+        return res.status(403).json({ error: 'Accesso negato: sessione già attiva' });
+    }
+
+    // Nuovo accesso: imposta la sessione
+    await kv.set(sessionKey, 'active', { ex: 25 });
 
     // Legge il file lista.m3u dalla root del progetto
     try {
