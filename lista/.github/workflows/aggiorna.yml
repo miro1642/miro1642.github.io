@@ -14,14 +14,13 @@ jobs:
 
       - name: Download base list
         run: |
-          curl -sL "https://nodrm.online/list/list2.m3u" > lista_privata.m3u
+          curl -sL -k --url "${{ secrets.URL_LISTA }}" > lista_privata.m3u
           echo "# Ultimo aggiornamento: $(date)" >> lista_privata.m3u
-          echo "Aggiornato il: $(date)" > last_sync.txt
 
       - name: Save
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add lista_privata.m3u last_sync.txt
+          git add lista_privata.m3u
           git commit -m "Update list $(date +'%H:%M')" || echo "No changes"
           git push origin main
