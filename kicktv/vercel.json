@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/get-list.js": {
-      "includeFiles": "lista.m3u"
-    }
-  }
-}

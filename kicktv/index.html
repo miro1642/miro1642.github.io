@@ -133,30 +133,36 @@
     </div>
 
 <script type="module">
-// === INICJALIZACJA INTERFEJSU ===
+// === INICJALIZACJA INTERFEJSU (ZAMIAST SPLASH I PASSWORD) ===
 async function startApp() {
     const splash = document.getElementById('splash-screen');
+    
+    // Ukrywamy splash screen automatycznie
     if (splash) {
-        splash.classList.add('fade-out');
-        setTimeout(() => splash.style.display = 'none', 800);
+        if (!splash.classList.contains('fade-out')) {
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 800);
+        }
     }
 
+    // Odkrywamy główny interfejs odtwarzacza
     document.getElementById('main-content').style.display = "flex";
 
+    // POBIERANIE PLAYLISTY BEZPOŚREDNIO JAKO PLIK STATYCZNY (BEZ VERCEL API)
     try {
-        // Zmieniono metodę na GET dla łatwiejszego testowania
-        const response = await fetch("/api/get-list", { method: 'GET' });
-        
+        const response = await fetch("./lista.m3u"); // Ścieżka relatywna do pliku statycznego
+
         if (!response.ok) {
-            // Próba wyciągnięcia szczegółowego komunikatu o błędzie z serwera
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error || `Status: ${response.status}`);
+            throw new Error(`Nie znaleziono pliku lista.m3u (Status: ${response.status})`);
         }
-        
+
         const m3uData = await response.text();
-        init(m3uData);
+        init(m3uData); // Uruchomienie odtwarzacza i budowanie siatki kanałów
+
     } catch (error) {
-        alert("Nie udało się załadować listy kanałów. Szczegóły: " + error.message);
+        alert("Błąd ładowania playlisty: " + error.message);
         console.error(error);
     }
 }
@@ -282,6 +288,7 @@ async function init(m3uContent) {
     chanCount.innerText = count + " CANALI";
 }
 
+// Wywołanie aplikacji bezpośrednio po załadowaniu odtwarzacza
 document.addEventListener('shaka-ui-loaded', startApp);
 </script>
 </body>
