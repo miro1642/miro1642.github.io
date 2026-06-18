@@ -135,25 +135,28 @@
 <script type="module">
 // === INICJALIZACJA INTERFEJSU ===
 async function startApp() {
-    // Ukrywamy splash screen od razu lub po krótkiej chwili
     const splash = document.getElementById('splash-screen');
     if (splash) {
         splash.classList.add('fade-out');
         setTimeout(() => splash.style.display = 'none', 800);
     }
 
-    // Pokazujemy główny interfejs
     document.getElementById('main-content').style.display = "flex";
 
-    // Pobieramy listę bezpośrednio z API bez żadnych haseł i nagłówków
     try {
-        const response = await fetch("/api/get-list", { method: 'POST' });
-        if (!response.ok) throw new Error("Błąd pobierania listy");
+        // Zmieniono metodę na GET dla łatwiejszego testowania
+        const response = await fetch("/api/get-list", { method: 'GET' });
+        
+        if (!response.ok) {
+            // Próba wyciągnięcia szczegółowego komunikatu o błędzie z serwera
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `Status: ${response.status}`);
+        }
         
         const m3uData = await response.text();
-        init(m3uData); // Uruchomienie odtwarzacza
+        init(m3uData);
     } catch (error) {
-        alert("Nie udało się załadować listy kanałów.");
+        alert("Nie udało się załadować listy kanałów. Szczegóły: " + error.message);
         console.error(error);
     }
 }
@@ -181,6 +184,7 @@ function isMobile() {
 }
 
 function extractCountryCode(groupTitle) {
+    if (!groupTitle) return null;
     const emojiMatch = groupTitle.trim().match(/^(\p{Regional_Indicator}{2})/u);
     if (emojiMatch && emojiToCountryCode[emojiMatch[1]]) return emojiToCountryCode[emojiMatch[1]];
     const codeMatch = groupTitle.trim().match(/^([A-Z]{2})\b/);
@@ -189,7 +193,7 @@ function extractCountryCode(groupTitle) {
 }
 
 function formatGroupTitle(groupTitle) {
-    if (isMobile()) return groupTitle;
+    if (isMobile() || !groupTitle) return groupTitle || "ALTRI";
     const code = extractCountryCode(groupTitle);
     if (!code) return groupTitle;
     const flagUrl = `https://flagcdn.com{code}.png`;
@@ -278,7 +282,6 @@ async function init(m3uContent) {
     chanCount.innerText = count + " CANALI";
 }
 
-// Uruchomienie aplikacji od razu po załadowaniu Shaka UI (bez pytania o hasło)
 document.addEventListener('shaka-ui-loaded', startApp);
 </script>
 </body>
