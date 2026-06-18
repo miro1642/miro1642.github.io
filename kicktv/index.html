@@ -133,64 +133,33 @@
     </div>
 
 <script type="module">
-// === GESTIONE SPLASH INIZIALE ===
-function setupSplash() {
+// === INICJALIZACJA INTERFEJSU ===
+async function startApp() {
+    // Ukrywamy splash screen od razu lub po krótkiej chwili
     const splash = document.getElementById('splash-screen');
-    
-    function hideSplashAndAskPassword() {
-        if (!splash.classList.contains('fade-out')) {
-            splash.classList.add('fade-out');
-            setTimeout(checkAccess, 800);
-        }
+    if (splash) {
+        splash.classList.add('fade-out');
+        setTimeout(() => splash.style.display = 'none', 800);
     }
 
-    splash.addEventListener('click', hideSplashAndAskPassword);
-    setTimeout(hideSplashAndAskPassword, 3000);
-}
+    // Pokazujemy główny interfejs
+    document.getElementById('main-content').style.display = "flex";
 
-// === GESTIONE PASSWORD (UPROSZCZONA) ===
-let passwordGlobale = "";
-
-async function checkAccess() {
-    const psw = prompt("Password:");
-    if (!psw) return;
-
+    // Pobieramy listę bezpośrednio z API bez żadnych haseł i nagłówków
     try {
-        const response = await fetch("/api/get-list", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: psw })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            alert(errorData.error || "Password errata!");
-            window.location.reload();
-            return;
-        }
-
+        const response = await fetch("/api/get-list", { method: 'POST' });
+        if (!response.ok) throw new Error("Błąd pobierania listy");
+        
         const m3uData = await response.text();
-        passwordGlobale = psw;
-        
-        // Pokazuje główną zawartość aplikacji
-        document.getElementById('main-content').style.display = "flex";
-        
-        // Wywołanie Twojej oryginalnej funkcji parsującej listę kanałów
-        if (typeof init === "function") {
-            init(m3uData);
-        }
-
+        init(m3uData); // Uruchomienie odtwarzacza
     } catch (error) {
-        alert("Errore server.");
+        alert("Nie udało się załadować listy kanałów.");
+        console.error(error);
     }
 }
-
-// Uruchomienie ekranu startowego
-setupSplash();
-
 
 // === INIZIALIZZAZIONE PLAYER E CANALI ===
-const FALLBACK_ICON = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 80" fill="none"><rect width="150" height="80" fill="#161b22"/><text x="75" y="45" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="14" fill="#f0f6fc">TV</text></svg>`);
+const FALLBACK_ICON = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://w3.org" viewBox="0 0 150 80" fill="none"><rect width="150" height="80" fill="#161b22"/><text x="75" y="45" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="14" fill="#f0f6fc">TV</text></svg>`);
 
 const emojiToCountryCode = {
     "🇵🇹": "pt", "🇧🇦": "ba", "🇮🇹": "it", "🇬🇧": "gb", "🇺🇸": "us",
@@ -223,7 +192,7 @@ function formatGroupTitle(groupTitle) {
     if (isMobile()) return groupTitle;
     const code = extractCountryCode(groupTitle);
     if (!code) return groupTitle;
-    const flagUrl = `https://flagcdn.com/w80/${code}.png`;
+    const flagUrl = `https://flagcdn.com{code}.png`;
     const imgHtml = `<img src="${flagUrl}" alt="${code}" class="flag-img" />`;
     return imgHtml + groupTitle.replace(/^(?:\p{Regional_Indicator}{2}|[A-Z]{2})\s*/u, '');
 }
@@ -309,8 +278,8 @@ async function init(m3uContent) {
     chanCount.innerText = count + " CANALI";
 }
 
-// Avvia la splash (che poi chiamerà checkAccess)
-document.addEventListener('shaka-ui-loaded', setupSplash);
+// Uruchomienie aplikacji od razu po załadowaniu Shaka UI (bez pytania o hasło)
+document.addEventListener('shaka-ui-loaded', startApp);
 </script>
 </body>
 </html>
